@@ -5,6 +5,18 @@ description: |
   Uses https://github.com/kronostechnologies/standards/blob/master/bin/docker-sast.sh to normalize results.
 
 inputs:
+  aws-access-key-id:
+    description: An AWS access key ID that has read permissions to the registry.
+    required: false
+    default: ''
+  aws-secret-access-key:
+    description: An AWS secret access key that has read permissions to the registry.
+    required: false
+    default: ''
+  aws-region:
+    description: AWS region for the registry.
+    required: false
+    default: ''
   defectdojo-engagement:
     description: "DefectDojo Engagement name or id"
     required: false
@@ -47,6 +59,23 @@ runs:
         working_directory=$(realpath ${{ inputs.working-directory }})
         echo "::set-output name=working-directory::$working_directory"
         echo "::set-output name=sarif-file::build/sast/${{ inputs.report-name }}.sarif"
+        echo "::set-output name=is-ecr::${{ inputs.aws-access-key-id != '' && inputs.aws-secret-access-key != '' && inputs.aws-region != '' }}"
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      if: steps.context.outputs.is-ecr == 'true'
+      with:
+        aws-access-key-id: ${{ inputs.aws-access-key-id }}
+        aws-secret-access-key: ${{ inputs.aws-secret-access-key }}
+        aws-region: ${{ inputs.aws-region }}
+
+    - name: Login to ECR
+      uses: aws-actions/amazon-ecr-login@v1
+      if: steps.context.outputs.is-ecr == 'true'
+
+    - name: Pull image
+      shell: bash
+      run: docker pull ${{ inputs.image-name }}
 
     - name: Docker SAST
       working-directory: ${{ steps.context.outputs.working-directory }}
