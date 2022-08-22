@@ -63,6 +63,8 @@ runs:
 
     - name: Docker SAST
       working-directory: ${{ steps.context.outputs.working-directory }}
+      env:
+        AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
       shell: bash
       run: |
         ${{ github.action_path }}/files/docker-sast.sh \
