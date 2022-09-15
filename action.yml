@@ -1,6 +1,6 @@
 name: Run SAST on Docker images and upload a SARIF report to Github.
 description: |
-  Utilizes Dockle to generate a SARIF report. The report is archived and uploaded to Github.
+  Utilizes Trivy to generate a SARIF report. The report is archived and uploaded to Github.
 
   Uses https://github.com/kronostechnologies/standards/blob/master/bin/docker-sast.sh to normalize results.
 
