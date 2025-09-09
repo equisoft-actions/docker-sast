@@ -71,6 +71,7 @@ runs:
       run: docker pull ${{ inputs.image-name }}
 
     - name: Check permissions
+      shell: bash
       run: |
         whoami
         groups $USER
