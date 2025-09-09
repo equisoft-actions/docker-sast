@@ -70,16 +70,11 @@ runs:
       shell: bash
       run: docker pull ${{ inputs.image-name }}
 
-    - name: Check permissions
-      shell: bash
-      run: |
-        whoami
-        groups $USER
-
     - name: Docker SAST
       working-directory: ${{ steps.context.outputs.working-directory }}
       env:
         AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
+        TMPDIR: ${{ runner.temp }}
       shell: bash
       run: |
         ${{ github.action_path }}/files/docker-sast.sh \
