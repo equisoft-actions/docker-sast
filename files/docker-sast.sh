@@ -46,6 +46,7 @@ output_file_path=$(realpath "$output_file")
 
 docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
   -v "$output_file_path":/tmp/output.sarif \
+  -u $(id -u):$(id -g) \
   "aquasec/trivy:$TRIVY_VERSION" \
   image \
   --cache-dir /tmp/.cache \
