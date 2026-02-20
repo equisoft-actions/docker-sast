@@ -2,8 +2,6 @@ name: Run SAST on Docker images and upload a SARIF report to Github.
 description: |
   Utilizes Trivy to generate a SARIF report. The report is archived and uploaded to Github.
 
-  Uses https://github.com/kronostechnologies/standards/blob/master/bin/docker-sast.sh to normalize results.
-
 inputs:
   aws-access-key-id:
     description: DEPRECATED. An AWS access key ID that has read permissions to the registry.
@@ -66,25 +64,21 @@ runs:
       uses: aws-actions/amazon-ecr-login@v2
       if: steps.context.outputs.is-ecr == 'true'
 
-    - name: Pull image
+    - name: Create output directory
       shell: bash
-      run: docker pull ${{ inputs.image-name }}
+      run: mkdir -p "$(dirname "${{ steps.context.outputs.working-directory }}/${{ steps.context.outputs.sarif-file }}")"
 
     - name: Docker SAST
-      working-directory: ${{ steps.context.outputs.working-directory }}
+      uses: aquasecurity/trivy-action@0.34.0
+      with:
+        scan-type: 'image'
+        image-ref: '${{ inputs.image-name }}'
+        format: 'sarif'
+        output: '${{ steps.context.outputs.working-directory }}/${{ steps.context.outputs.sarif-file }}'
+        scanners: 'vuln'
+        vuln-type: 'os'
       env:
-        AWS_DEFAULT_REGION: ${{ inputs.aws-region }}
-        TMPDIR: ${{ runner.temp }}
-      shell: bash
-      run: |
-        ${{ github.action_path }}/files/docker-sast.sh \
-          -o "${{ steps.context.outputs.sarif-file }}" \
-          "${{ inputs.image-name }}"
-
-        result=$?
-        if [ $result -ne 0 ]; then
-          exit $result
-        fi
+        TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db
 
     - uses: actions/upload-artifact@v6
       if: "!cancelled()"
