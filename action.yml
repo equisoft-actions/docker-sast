@@ -69,7 +69,7 @@ runs:
       run: mkdir -p "$(dirname "${{ steps.context.outputs.working-directory }}/${{ steps.context.outputs.sarif-file }}")"
 
     - name: Docker SAST
-      uses: aquasecurity/trivy-action@0.34.0
+      uses: aquasecurity/trivy-action@0.34.1
       with:
         scan-type: 'image'
         image-ref: '${{ inputs.image-name }}'
