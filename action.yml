@@ -80,7 +80,7 @@ runs:
       env:
         TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db
 
-    - uses: actions/upload-artifact@v6
+    - uses: actions/upload-artifact@v7
       if: "!cancelled()"
       with:
         name: ${{ inputs.report-name }}.sarif
