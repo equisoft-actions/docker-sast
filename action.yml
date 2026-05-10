@@ -51,7 +51,7 @@ runs:
         echo "is-ecr=${{ inputs.aws-region != '' }}" >> $GITHUB_OUTPUT
 
     - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v6
+      uses: aws-actions/configure-aws-credentials@d979d5b3a71173a29b74b5b88418bfda9437d885 # v6
       if: steps.context.outputs.is-ecr == 'true'
       with:
         aws-access-key-id: ${{ steps.context.outputs.has-role != 'true' && inputs.aws-access-key-id || '' }}
@@ -61,7 +61,7 @@ runs:
         role-session-name: ${{ inputs.role-session-name }}
 
     - name: Login to ECR
-      uses: aws-actions/amazon-ecr-login@v2
+      uses: aws-actions/amazon-ecr-login@fa648b43de3d4d023bcb3f89ed6940096949c419 # v2
       if: steps.context.outputs.is-ecr == 'true'
 
     - name: Create output directory
@@ -69,7 +69,7 @@ runs:
       run: mkdir -p "$(dirname "${{ steps.context.outputs.working-directory }}/${{ steps.context.outputs.sarif-file }}")"
 
     - name: Docker SAST
-      uses: aquasecurity/trivy-action@0.35.0
+      uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
       with:
         scan-type: 'image'
         image-ref: '${{ inputs.image-name }}'
@@ -80,7 +80,7 @@ runs:
       env:
         TRIVY_DB_REPOSITORY: public.ecr.aws/aquasecurity/trivy-db
 
-    - uses: actions/upload-artifact@v7
+    - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
       if: "!cancelled()"
       with:
         name: ${{ inputs.report-name }}.sarif
@@ -88,7 +88,7 @@ runs:
         retention-days: ${{ inputs.report-retention-days }}
 
     - name: Publish report
-      uses: github/codeql-action/upload-sarif@v4
+      uses: github/codeql-action/upload-sarif@68bde559dea0fdcac2102bfdf6230c5f70eb485e # v4
       with:
         category: ${{ inputs.report-name }}
         sarif_file: ${{ inputs.working-directory }}/${{ steps.context.outputs.sarif-file }}
